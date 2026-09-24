@@ -1,0 +1,48 @@
+{
+  "name": "scriptgo-website",
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@11.13.0",
+  "scripts": {
+    "build:pages": "vite build --ssr scripts/generate-pages.tsx --outDir dist-ssr && node dist-ssr/generate-pages.js",
+    "dev": "vite",
+    "build": "vite build && vite build --ssr scripts/generate-pages.tsx --outDir dist-ssr && node dist-ssr/generate-pages.js",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.70.1",
+    "@typescript-eslint/parser": "^8.70.1",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.1",
+    "unplugin-auto-import": "^21.1.0",
+    "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@bjorn3/browser_wasi_shim": "^0.4.2",
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@mdx-js/rollup": "^3.1.1",
+    "@vitejs/plugin-react": "^6.1.1",
+    "codemirror": "^6.0.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1"
+  }
+}
