@@ -7,6 +7,7 @@ export interface ReleaseInfo {
 }
 
 export const FALLBACK_RELEASES: string[] = [
+  'v0.1.0-alpha.7',
   'v0.1.0-alpha.6',
   'v0.1.0-alpha.5',
   'v0.1.0-alpha.4',

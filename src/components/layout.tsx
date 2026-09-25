@@ -40,7 +40,7 @@ export const navItems: NavItem[] = [
     path: '/compatibility/',
     title: 'Compatibility Matrix',
     subItems: [
-      { hash: '#394-corpus-tests', title: '394 Corpus tests' },
+      { hash: '#433-corpus-tests', title: '433 Corpus tests' },
       { hash: '#compilation-tiers', title: 'Compilation tiers' },
       { hash: '#diagnostic-codes-sgxxxx', title: 'Diagnostic codes (SGxxxx)' },
     ],
@@ -68,8 +68,10 @@ export const navItems: NavItem[] = [
     title: 'Standard Library & Web APIs',
     subItems: [
       { hash: '#the-4-tier-model', title: 'The 4-tier model' },
-      { hash: '#nodejs-core-modules', title: 'Node.js core modules' },
+      { hash: '#100-parity-node-modules', title: '100% Parity Node modules' },
       { hash: '#web-standards-wintercg', title: 'Web standards (WinterCG)' },
+      { hash: '#whatwg-fetch-and-formdata', title: 'Fetch & FormData' },
+      { hash: '#whatwg-urlpattern', title: 'URLPattern' },
     ],
   },
   {
@@ -104,8 +106,10 @@ export const navItems: NavItem[] = [
     title: 'CLI Reference',
     subItems: [
       { hash: '#command-overview', title: 'Command overview' },
+      { hash: '#direct-execution--scg-alias', title: 'Direct execution & scg alias' },
       { hash: '#scriptgo-build', title: 'scriptgo build' },
       { hash: '#scriptgo-run', title: 'scriptgo run' },
+      { hash: '#scriptgo-add', title: 'scriptgo add' },
       { hash: '#scriptgo-check', title: 'scriptgo check' },
       { hash: '#scriptgo-emit', title: 'scriptgo emit' },
       { hash: '#scriptgo-coverage', title: 'scriptgo coverage' },
@@ -129,9 +133,13 @@ const headingAliases: Record<string, string> = {
   '#overview': '#command-overview',
   '#build': '#scriptgo-build',
   '#run': '#scriptgo-run',
+  '#add': '#scriptgo-add',
+  '#scg': '#direct-execution--scg-alias',
   '#check': '#scriptgo-check',
   '#emit': '#scriptgo-emit',
   '#coverage': '#scriptgo-coverage',
+  '#corpus-tests': '#433-corpus-tests',
+  '#394-corpus-tests': '#433-corpus-tests',
 };
 
 function normalizeHash(h: string): string {
@@ -231,7 +239,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   ScriptGo
                 </strong>
                 <span style={{ fontSize: '12px', color: 'var(--fg)', fontStyle: 'italic' }}>
-                  v0.1.0-alpha.6
+                  v0.1.0-alpha.7
                 </span>
               </div>
             </a>

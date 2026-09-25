@@ -23,7 +23,7 @@ export const ParityTable: React.FC = () => {
   return (
     <div style={{ margin: '24px 0' }}>
       <p>
-        All <strong>394 corpus regression test cases</strong> (379 native execution tests + 15
+        All <strong>433 corpus regression test cases</strong> (416 native execution tests + 17
         static diagnostic tests) pass at <strong>100% parity</strong> against the Node.js v22 core
         subset on macOS and Linux.
       </p>

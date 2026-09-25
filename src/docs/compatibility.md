@@ -2,9 +2,9 @@ import { ParityTable } from '../components/parity-table';
 
 # Compatibility Matrix
 
-ScriptGo tests against the Node.js core subset using a 394-case regression suite (379 native PASS + 15 diagnostic PASS). Compatibility is explicitly tracked across three strict compilation tiers to avoid silent semantic shifts.
+ScriptGo tests against the Node.js core subset using a 433-case regression suite (416 native PASS + 17 diagnostic PASS). Compatibility is explicitly tracked across three strict compilation tiers to avoid silent semantic shifts.
 
-## 394 Corpus tests
+## 433 Corpus tests
 
 <ParityTable />
 

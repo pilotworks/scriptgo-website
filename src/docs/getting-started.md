@@ -31,9 +31,19 @@ chmod +x /usr/local/bin/scriptgo
 ```sh
 git clone https://github.com/pilotworks/scriptgo.git
 cd scriptgo
-go build -o scriptgo ./cmd/scriptgo
-sudo mv scriptgo /usr/local/bin/
+make build # builds scriptgo and scg binary alias
+sudo mv scriptgo scg /usr/local/bin/
 ```
+
+### CLI alias: `scg`
+
+ScriptGo provides `scg` as an official, first-class short binary alias. If you installed via pre-built binaries or Homebrew, you can create a symlink:
+
+```sh
+sudo ln -sf /usr/local/bin/scriptgo /usr/local/bin/scg
+```
+
+Every command, flag, and direct file execution works identically with `scriptgo` or `scg`.
 
 ### Toolchain prerequisites
 
@@ -61,7 +71,7 @@ Compile it directly to an optimized native binary:
 
 ```sh
 # 1. Compile to native machine code
-scriptgo build server.ts -o server
+scg build server.ts -o server
 
 # 2. Inspect the resulting binary (e.g. on macOS / Linux)
 file ./server
@@ -71,12 +81,37 @@ file ./server
 ./server
 ```
 
-For rapid development, execute TypeScript files directly on the host or evaluate inline scripts:
+## Direct file execution
+
+For rapid development, execute TypeScript files directly on the host without typing `run` or needing a compile step, exactly like `node` or `bun`:
 
 ```sh
-# Compile and execute immediately in memory
-scriptgo run server.ts
+# Run a TypeScript file directly (zero flags needed)
+scg server.ts
+scriptgo server.ts
 
-# Evaluate inline code
-scriptgo run -e "console.log('Math.sqrt(144) =', Math.sqrt(144))"
+# Pass arguments directly to your application
+scg server.ts -- --port 8080 --verbose
+
+# Evaluate inline TypeScript expressions
+scg -e "console.log('Math.sqrt(144) =', Math.sqrt(144))"
+scriptgo -e "console.log('2 ** 10 =', 2 ** 10)"
+```
+
+## Adding dependencies (`scriptgo add` / `scg add`)
+
+ScriptGo includes a built-in, zero-copy package manager compatible with the npm registry. Install dependencies with automatic SemVer resolution, streaming SHA-512 SRI verification, and lockfile updates:
+
+```sh
+# Add runtime dependencies to package.json and install into node_modules
+scg add lodash express
+
+# Add development dependencies
+scg add -D typescript @types/node
+
+# Pin an exact package version
+scg add -E redis
+
+# Add optional packages
+scg add -O sharp
 ```

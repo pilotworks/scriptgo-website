@@ -5,21 +5,78 @@ The `scriptgo` CLI provides a unified toolchain for compiling, running, type-che
 ## Command overview
 
 ```sh
+# Direct file execution (run without typing 'run')
+scriptgo <entry.ts> [-- <args...>]
+scriptgo -e "<code string>" [-- <args...>]
+
+# Subcommands
 scriptgo <command> [flags] <arguments>
+
+# Binary alias 'scg' (supported interchangeably across all commands)
+scg <entry.ts> [-- <args...>]
+scg <command> [flags] <arguments>
 ```
 
-| Command                          | Syntax                                         | Description                                                                  |
-| -------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------- |
-| [`build`](#scriptgo-build)       | `scriptgo build [flags] <entry.ts>`            | Compile TypeScript into a standalone, optimized native executable.           |
-| [`run`](#scriptgo-run)           | `scriptgo run [flags] <entry.ts> [-- <args>]`  | Compile and execute TypeScript immediately in memory or on the host.         |
-| [`check`](#scriptgo-check)       | `scriptgo check [flags] [<entry.ts> \| <dir>]` | Verify syntax, types, and native static subset rules without compiling.      |
-| [`emit`](#scriptgo-emit)         | `scriptgo emit [flags] <entry.ts>`             | Emit raw LLVM IR (`.ll`) or middle-end Typed IR text.                        |
-| [`coverage`](#scriptgo-coverage) | `scriptgo coverage [flags] <entry.ts>`         | Analyze Static, Dynamic, and Unsupported site compatibility distribution.    |
-| [`init`](#scriptgo-init)         | `scriptgo init [flags] [<dir>]`                | Initialize a new TypeScript project with `tsconfig.json` and `package.json`. |
-| [`install`](#scriptgo-install)   | `scriptgo install [flags]`                     | Resolve, verify (SRI), cache, and link `package.json` dependencies.          |
-| [`task`](#scriptgo-task)         | `scriptgo task [flags] [<script>]`             | Run a `package.json` script with `node_modules/.bin` in `$PATH`.             |
-| `version`                        | `scriptgo version`                             | Print compiler and runtime ABI version information.                          |
-| `help`                           | `scriptgo help [<command>]`                    | Show usage help for ScriptGo or a specific sub-command.                      |
+| Command                          | Syntax                                                                              | Description                                                                  |
+| -------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [`build`](#scriptgo-build)       | `scriptgo build [flags] <entry.ts>`                                                 | Compile TypeScript into a standalone, optimized native executable.           |
+| [`run`](#scriptgo-run)           | `scriptgo run [flags] <entry.ts> [-- <args>]`<br/>`scriptgo <entry.ts> [-- <args>]` | Compile and execute TypeScript immediately in memory or on the host.         |
+| [`add`](#scriptgo-add)           | `scriptgo add [flags] <package...>`                                                 | Resolve, record, and install dependencies into `package.json` & lockfile.    |
+| [`check`](#scriptgo-check)       | `scriptgo check [flags] [<entry.ts> \| <dir>]`                                      | Verify syntax, types, and native static subset rules without compiling.      |
+| [`emit`](#scriptgo-emit)         | `scriptgo emit [flags] <entry.ts>`                                                  | Emit raw LLVM IR (`.ll`) or middle-end Typed IR text.                        |
+| [`coverage`](#scriptgo-coverage) | `scriptgo coverage [flags] <entry.ts>`                                              | Analyze Static, Dynamic, and Unsupported site compatibility distribution.    |
+| [`init`](#scriptgo-init)         | `scriptgo init [flags] [<dir>]`                                                     | Initialize a new TypeScript project with `tsconfig.json` and `package.json`. |
+| [`install`](#scriptgo-install)   | `scriptgo install [flags]`                                                          | Resolve, verify (SRI), cache, and link `package.json` dependencies.          |
+| [`task`](#scriptgo-task)         | `scriptgo task [flags] [<script>]`                                                  | Run a `package.json` script with `node_modules/.bin` in `$PATH`.             |
+| `version`                        | `scriptgo version`                                                                  | Print compiler and runtime ABI version information.                          |
+| `help`                           | `scriptgo help [<command>]`                                                         | Show usage help for ScriptGo or a specific sub-command.                      |
+
+---
+
+## Direct execution & scg alias
+
+### Direct file execution
+
+You can execute TypeScript files directly on the host without typing `run`, exactly like `node file.js` or `bun file.ts`:
+
+```sh
+# Run a TypeScript file directly
+scriptgo main.ts
+scg main.ts
+
+# Pass command line arguments
+scriptgo main.ts -- --port 8080 --verbose
+scg main.ts -- --port 8080 --verbose
+
+# Evaluate inline code directly
+scriptgo -e "console.log('1 + 2 =', 1 + 2)"
+scg -e "console.log('1 + 2 =', 1 + 2)"
+```
+
+When a command name matches an existing file, ScriptGo executes that file directly. Running `scriptgo run <script>` prioritizes scripts defined in `package.json` before falling back to local source file execution.
+
+### Binary alias: `scg`
+
+ScriptGo provides `scg` as an official, first-class short alias for `scriptgo`. It works interchangeably across all subcommands, direct executions, and flags:
+
+```sh
+# Direct execution
+scg server.ts
+
+# Compile and build
+scg build server.ts --release -o server
+
+# Add dependencies
+scg add lodash-es
+scg add -D typescript @types/node
+
+# Type-check
+scg check src/index.ts
+
+# Run scripts or tasks
+scg task build
+scg run start
+```
 
 ---
 
@@ -115,6 +172,56 @@ scriptgo run -e "console.log('2^32 =', Math.pow(2, 32))"
 
 # 4. Run package.json script
 scriptgo run build
+```
+
+---
+
+## scriptgo add
+
+Resolves package versions from an npm-compatible registry or local workspace, records them into `package.json` (`dependencies`, `devDependencies`, `optionalDependencies`, `peerDependencies`), and installs them into `node_modules/` and `scriptgo-lock.json` with transactional rollback on failure.
+
+```sh
+scriptgo add [flags] <package...>
+scg add [flags] <package...>
+```
+
+### Flags
+
+| Flag                       | Type    | Description                                                              |
+| -------------------------- | ------- | ------------------------------------------------------------------------ |
+| `-D, --dev`                | Boolean | Save package to `devDependencies`.                                       |
+| `-O, --optional`           | Boolean | Save package to `optionalDependencies`.                                  |
+| `--peer`                   | Boolean | Save package to `peerDependencies`.                                      |
+| `-E, --exact`              | Boolean | Save exact pinned version instead of `^x.y.z` SemVer range.              |
+| `--offline`                | Boolean | Use only cached tarballs and existing lockfile without network requests. |
+| `--project <dir>`          | Path    | Project directory containing `package.json` (default: `.`).              |
+| `--manifest <path>`        | Path    | `package.json` path (default: `<project>/package.json`).                 |
+| `--lockfile <path>`        | Path    | `scriptgo-lock.json` path (default: `<project>/scriptgo-lock.json`).     |
+| `--store <path>`           | Path    | Content store cache directory (default: `~/.scriptgo/store`).            |
+| `--registry <url>`         | URL     | npm-compatible registry URL (default: `https://registry.npmjs.org`).     |
+| `--registry-token <token>` | String  | Registry bearer token (or `$SCRIPTGO_NPM_TOKEN` / `$NPM_TOKEN`).         |
+
+### Examples
+
+```sh
+# 1. Add latest stable dependencies
+scriptgo add lodash
+scg add express
+
+# 2. Add specific version or tag
+scriptgo add chalk@4.1.2
+
+# 3. Add development dependencies
+scriptgo add -D typescript @types/node
+scg add --dev vitest
+
+# 4. Save exact pinned version (no ^ prefix)
+scriptgo add -E redis
+scg add --exact pg
+
+# 5. Add optional or peer dependencies
+scriptgo add -O sharp
+scg add --peer react
 ```
 
 ---
@@ -235,6 +342,28 @@ scriptgo init [flags] [<directory>]
 #   -y, --yes      Initialize with default settings without prompting
 #   -f, --force    Overwrite existing files
 #   --name <name>  Package name (defaults to directory name)
+```
+
+### scriptgo add
+
+Resolves package versions from the npm registry or workspace, records them into `package.json`, and installs them into `node_modules/` and `scriptgo-lock.json`.
+
+```sh
+scriptgo add [flags] <package...>
+scg add [flags] <package...>
+
+# Flags:
+#   -D, --dev             Add to devDependencies
+#   -O, --optional        Add to optionalDependencies
+#   --peer                Add to peerDependencies
+#   -E, --exact           Save exact version instead of ^x.y.z
+#   --offline             Use cached tarballs without network requests
+#   --project <dir>       Project directory (default: .)
+#   --manifest <path>     package.json path
+#   --lockfile <path>     Lockfile path
+#   --store <path>        Content store path (default: ~/.scriptgo/store)
+#   --registry <url>      npm registry URL
+#   --registry-token <t>  Registry bearer token
 ```
 
 ### scriptgo install
